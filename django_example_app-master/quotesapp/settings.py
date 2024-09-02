@@ -82,17 +82,14 @@ WSGI_APPLICATION = 'quotesapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'Proyecto-Servicios',
-        'HOST': '127.0.0.1\MSI',
-        'PORT': '1434',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Proyecto_Software',
+        'USER': 'postgres',
+        'PASSWORD': 'lucafacultad',
+        'HOST': '127.0.0.1',  # o el host de tu servidor PostgreSQL
+        'PORT': '5432',
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
