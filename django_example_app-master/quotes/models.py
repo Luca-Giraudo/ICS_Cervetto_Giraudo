@@ -1,15 +1,27 @@
 from django.db import models
 from localflavor.ar.ar_provinces import PROVINCE_CHOICES
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=30)
-    email = models.EmailField(unique=True)
+class CustomUser(AbstractUser):
     perfil_empresa = models.ForeignKey('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
     perfil_usuario = models.ForeignKey('PerfilUsuario', on_delete=models.CASCADE, null=True, blank=True)
     favoritos = models.ForeignKey('Favorito', on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self):
-        return self.nombre
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
 
 class PerfilEmpresa(models.Model):
     nombre = models.CharField(max_length=100)
