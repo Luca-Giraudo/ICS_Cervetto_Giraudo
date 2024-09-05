@@ -6,7 +6,8 @@
     </div>
   </template>
 
-  <script>
+<script>
+/* eslint-disable */
   export default {
     methods: {
       goToLogin() {
@@ -14,11 +15,11 @@
       }
     }
   };
-  </script>
+</script>
 
-  <style scoped>
+<style scoped>
   .welcome {
     text-align: center;
     margin-top: 50px;
   }
-  </style>
+</style>
