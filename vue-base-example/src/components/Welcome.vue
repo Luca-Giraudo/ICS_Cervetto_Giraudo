@@ -4,7 +4,7 @@
       <button @click="goToLogin">Iniciar sesión</button>
       <router-link to="/register">Regístrate aquí</router-link>
     </div>
-  </template>
+</template>
 
   <script>
   export default {

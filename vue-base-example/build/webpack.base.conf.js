@@ -2,7 +2,11 @@
 const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
+<<<<<<< Updated upstream
 const vueLoaderConfig = require('./vue-loader.conf')
+=======
+const utils = require('./utils')
+>>>>>>> Stashed changes
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -52,6 +56,21 @@ module.exports = {
         include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]
       },
       {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: utils.assetsPath('img/[name].[hash:7].[ext]')
+        }
+      },
+      {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
@@ -77,6 +96,7 @@ module.exports = {
       }
     ]
   },
+<<<<<<< Updated upstream
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
     // source contains it (although only uses it if it's native).
@@ -89,4 +109,10 @@ module.exports = {
     tls: 'empty',
     child_process: 'empty'
   }
+=======
+  plugins: [
+    new VueLoaderPlugin()
+  ],
+  node: false
+>>>>>>> Stashed changes
 }
