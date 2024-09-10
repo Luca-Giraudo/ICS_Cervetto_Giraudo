@@ -42,19 +42,20 @@ export default {
     };
   },
   methods: {
-  async register() {
+    async register() {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/register/', {
-        email: this.email,
-        password: this.password,
-        first_name: this.firstName,
-        last_name: this.lastName
-      });
-      console.log('User registered:', response.data);
-      // Maneja la respuesta, por ejemplo, redirigiendo al usuario o mostrando un mensaje.
+        const response = await axios.post('http://127.0.0.1:8000/api/register/', {
+            email: this.email,
+            password: this.password,
+            confirm_password: this.confirmPassword,
+            first_name: this.firstName,
+            last_name: this.lastName
+        });
+        console.log('User registered:', response.data);
+        // Redirige al usuario a la pantalla de bienvenida
+        this.$router.push('/');
     } catch (error) {
-      console.error('Error registering user:', error);
-      // Maneja errores de registro.
+        console.error('Error registering user:', error);
     }
   }
 }

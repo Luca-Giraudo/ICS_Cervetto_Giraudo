@@ -1,11 +1,21 @@
 from django.db import models
 from localflavor.ar.ar_provinces import PROVINCE_CHOICES
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
+from .managers import CustomUserManager
 
-class CustomUser(AbstractUser):
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
     perfil_empresa = models.ForeignKey('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
     perfil_usuario = models.ForeignKey('PerfilUsuario', on_delete=models.CASCADE, null=True, blank=True)
     favoritos = models.ForeignKey('Favorito', on_delete=models.CASCADE, null=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nombre', 'apellido']
+
+    objects = CustomUserManager()  # Asigna el CustomUserManager a la clase
 
     groups = models.ManyToManyField(
         Group,
@@ -22,6 +32,15 @@ class CustomUser(AbstractUser):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        permissions = [
+            ("can_view_profile", "Can view profile"),
+            ("can_edit_profile", "Can edit profile"),
+        ]
 
 class PerfilEmpresa(models.Model):
     nombre = models.CharField(max_length=100)

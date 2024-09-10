@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from .models import CustomUser
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from rest_framework.authtoken.models import Token
 
 # Create your views here.
 def index(request):

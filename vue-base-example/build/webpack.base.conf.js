@@ -48,6 +48,13 @@ module.exports = {
         }
       },
       {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
+      },
+      {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         type: 'asset/resource',
         generator: {
@@ -60,11 +67,8 @@ module.exports = {
     new VueLoaderPlugin()
   ],
   node: {
-    setImmediate: false,
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-    child_process: 'empty'
+    __dirname: true,
+    __filename: true,
+    global: true
   }
 }

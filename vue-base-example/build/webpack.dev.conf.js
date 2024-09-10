@@ -12,11 +12,11 @@ module.exports = merge(baseWebpackConfig, {
     hot: true,
     port: 8080,
     static: {
-      directory: path.join(__dirname, '../static'),
+      directory: path.join(__dirname, 'public'),
     },
     historyApiFallback: true,
     open: true,
-    compress: true
+    compress: true,
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
