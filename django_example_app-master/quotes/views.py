@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 # Create your views here.
 def index(request):
@@ -37,3 +39,11 @@ class LoginAPI(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": token.key
         })
+
+class UserDetailAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
