@@ -27,6 +27,9 @@
         <span class="icon">🔍</span>
       </div>
 
+      <!-- Botón para ir al perfil -->
+      <button @click="goToProfile" class="profile-btn">Ir al Perfil</button>
+
       <!-- Texto de "🔥Populares" pegado a la izquierda -->
       <p class="populares-text">🔥 Populares</p>
     </div>
@@ -82,6 +85,9 @@ export default {
       localStorage.removeItem('token');
       this.user = null;
       this.$router.push('/');
+    },
+    goToProfile() {
+      this.$router.push('/profile');  // Redirige a la página de perfil
     },
   },
 };
@@ -139,7 +145,20 @@ export default {
   margin: 0 auto;
 }
 
-/* Estilo del cuadro de búsqueda */
+.profile-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.profile-btn:hover {
+  background-color: #45a049;
+}
+
 .input-container {
   margin-top: 20px;
   width: 220px;
@@ -170,7 +189,6 @@ export default {
   transform: translateY(calc(-50% - 5px));
 }
 
-/* Animación del ícono de búsqueda */
 .input-container:hover > .icon {
   animation: anim 1s linear infinite;
 }
@@ -184,7 +202,6 @@ export default {
   }
 }
 
-/* Estilo del texto "Populares" */
 .populares-text {
   text-align: left;
   margin-top: 30px;

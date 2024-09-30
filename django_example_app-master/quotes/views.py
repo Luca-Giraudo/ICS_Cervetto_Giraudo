@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, CustomUserSerializer, PerfilEmpresaSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -14,6 +14,31 @@ def index(request):
 
 def main(request):
     return render(request, 'quotes/main.html')
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CustomUserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
+class CreateEmpresaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if user.perfil_empresa:
+            return Response({"error": "El perfil de empresa ya ha sido creado."}, status=400)
+
+        data = request.data
+        serializer = PerfilEmpresaSerializer(data=data)
+        if serializer.is_valid():
+            perfil_empresa = serializer.save()
+            user.perfil_empresa = perfil_empresa
+            user.save()
+            return Response({"message": "Perfil de empresa creado exitosamente"}, status=201)
+        return Response(serializer.errors, status=400)
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
