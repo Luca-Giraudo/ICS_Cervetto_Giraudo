@@ -3,19 +3,18 @@ from localflavor.ar.ar_provinces import PROVINCE_CHOICES
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from .managers import CustomUserManager
 
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    perfil_empresa = models.ForeignKey('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
-    perfil_usuario = models.ForeignKey('PerfilUsuario', on_delete=models.CASCADE, null=True, blank=True)
+    perfil_empresa = models.OneToOneField('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
+    perfil_usuario = models.OneToOneField('PerfilUsuario', on_delete=models.CASCADE, null=True, blank=True)
     favoritos = models.ForeignKey('Favorito', on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nombre', 'apellido']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    objects = CustomUserManager()  # Asigna el CustomUserManager a la clase
+    objects = CustomUserManager()
 
     groups = models.ManyToManyField(
         Group,

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, PerfilUsuario, PerfilEmpresa
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'first_name']
+        fields = ['id', 'email', 'first_name', 'last_name']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -37,13 +37,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
-        # Crear el usuario sin establecer el password directamente
         user = CustomUser.objects.create(
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name']
         )
-        # Establecer el password usando el método `set_password`
         user.set_password(password)
         user.save()
         return user
@@ -57,3 +55,13 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Credenciales incorrectas")
+
+class PerfilUsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfilUsuario
+        fields = ['nombre', 'localidad', 'telefono']
+
+class PerfilEmpresaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfilEmpresa
+        fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono']
