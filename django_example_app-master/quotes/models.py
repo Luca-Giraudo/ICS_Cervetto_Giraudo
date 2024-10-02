@@ -8,8 +8,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    perfil_empresa = models.OneToOneField('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
-    perfil_usuario = models.OneToOneField('PerfilUsuario', on_delete=models.CASCADE, null=True)
     favoritos = models.ForeignKey('Favorito', on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
@@ -42,7 +40,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             ("can_edit_profile", "Can edit profile"),
         ]
 
-class PerfilEmpresa(models.Model):
+class Perfil(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=144)
     enlaces = models.URLField(max_length=200, blank=True, null=True)
@@ -52,13 +51,5 @@ class PerfilEmpresa(models.Model):
     def __str__(self):
         return self.nombre
 
-class PerfilUsuario(models.Model):
-    nombre = models.CharField(max_length=100, blank=True, null=True)
-    localidad = models.CharField(max_length=100, choices=PROVINCE_CHOICES, blank=True, null=True)
-    telefono = models.CharField(max_length=15, blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
-
 class Favorito(models.Model):
-    servicio = models.ForeignKey('PerfilEmpresa', on_delete=models.CASCADE, null=True, blank=True)
+    servicio = models.ForeignKey('Perfil', on_delete=models.CASCADE, null=True, blank=True)

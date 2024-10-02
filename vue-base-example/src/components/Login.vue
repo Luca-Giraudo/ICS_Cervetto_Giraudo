@@ -37,6 +37,8 @@ export default {
   methods: {
     async login() {
       try {
+        const token = localStorage.getItem('token');
+        console.log('Token antes de la solicitud:', token);
         const response = await axios.post('http://127.0.0.1:8000/api/login/', {
           email: this.email,
           password: this.password
@@ -45,6 +47,8 @@ export default {
         // Guarda el token y la información del usuario en localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+
+        console.log('Token almacenado:', response.data.token);
 
         // Redirige a la página principal (WelcomeUser)
         this.$router.push('/welcome-user');

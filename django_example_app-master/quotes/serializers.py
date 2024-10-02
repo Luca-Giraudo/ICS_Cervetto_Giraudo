@@ -1,49 +1,34 @@
 from rest_framework import serializers
-from .models import CustomUser, PerfilEmpresa, PerfilUsuario
+from .models import CustomUser, Perfil
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-class PerfilUsuarioSerializer(serializers.ModelSerializer):
+class PerfilSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PerfilUsuario
-        fields = ['nombre', 'localidad', 'telefono']
-
-class PerfilEmpresaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PerfilEmpresa
+        model = Perfil
         fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono']
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    perfil_usuario = PerfilUsuarioSerializer()
-    perfil_empresa = PerfilEmpresaSerializer(required=False)
+    perfil = PerfilSerializer()
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'first_name', 'last_name', 'perfil_usuario', 'perfil_empresa']
+        fields = ['email', 'first_name', 'last_name', 'perfil']
 
     def update(self, instance, validated_data):
-        perfil_usuario_data = validated_data.pop('perfil_usuario', None)
-        perfil_empresa_data = validated_data.pop('perfil_empresa', None)
+        perfil_data = validated_data.pop('perfil', None)
 
         # Actualización de PerfilUsuario
-        if perfil_usuario_data:
-            perfil_usuario = instance.perfil_usuario
-            for attr, value in perfil_usuario_data.items():
-                setattr(perfil_usuario, attr, value)
-            perfil_usuario.save()
+        if perfil_data:
+            perfil = instance.perfil
+            for attr, value in perfil_data.items():
+                setattr(perfil, attr, value)
+            perfil.save()
 
-        # Actualización o creación de PerfilEmpresa
-        if perfil_empresa_data:
-            if instance.perfil_empresa:
-                perfil_empresa = instance.perfil_empresa
-                for attr, value in perfil_empresa_data.items():
-                    setattr(perfil_empresa, attr, value)
-                perfil_empresa.save()
-            else:
-                perfil_empresa = PerfilEmpresa.objects.create(**perfil_empresa_data)
-                instance.perfil_empresa = perfil_empresa
-                instance.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
 
         return instance
 
