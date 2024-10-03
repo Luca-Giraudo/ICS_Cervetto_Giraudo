@@ -21,6 +21,9 @@
       <!-- Mensaje de bienvenida con el nombre del usuario -->
       <h1>Bienvenido, {{ user.first_name }}!</h1>
 
+      <!-- Botón para acceder al perfil del usuario -->
+      <button @click="goToProfile" class="profile-button">Ir a mi Perfil</button>
+
       <!-- Barra de búsqueda centrada -->
       <div class="search-bar">
         <input type="text" class="input" placeholder="Buscar...">
@@ -77,6 +80,9 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    goToProfile() {
+      this.$router.push('/profile'); // Redirige al perfil del usuario
     },
     logout() {
       localStorage.removeItem('token');
@@ -139,6 +145,20 @@ export default {
   margin: 0 auto;
 }
 
+/* Estilo del botón de perfil */
+.profile-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.profile-button:hover {
+  background-color: #45a049;
+}
+
 /* Estilo del cuadro de búsqueda */
 .input-container {
   margin-top: 20px;
@@ -170,7 +190,6 @@ export default {
   transform: translateY(calc(-50% - 5px));
 }
 
-/* Animación del ícono de búsqueda */
 .input-container:hover > .icon {
   animation: anim 1s linear infinite;
 }
