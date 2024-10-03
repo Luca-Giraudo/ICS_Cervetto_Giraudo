@@ -42,11 +42,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Perfil(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.CharField(max_length=144)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    descripcion = models.CharField(max_length=144, blank=True, null=True)
     enlaces = models.URLField(max_length=200, blank=True, null=True)
-    localidad = models.CharField(max_length=100, choices=PROVINCE_CHOICES)
-    telefono = models.CharField(max_length=15)
+    localidad = models.CharField(max_length=100, choices=PROVINCE_CHOICES, blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return self.nombre

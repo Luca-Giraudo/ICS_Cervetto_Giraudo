@@ -23,7 +23,12 @@
         <!-- Localidad -->
         <div class="form-group">
           <label for="localidad">Localidad</label>
-          <input type="text" v-model="localidad" id="localidad" placeholder="Introduce tu localidad" />
+          <select v-model="localidad" id="localidad">
+            <option value="" disabled>Selecciona tu provincia</option>
+            <option v-for="province in provinceChoices" :key="province" :value="province">
+              {{ province }}
+            </option>
+          </select>
         </div>
 
         <!-- Teléfono -->
@@ -52,9 +57,18 @@ export default {
   data() {
     return {
       nombre: '',
-      localidad: '',
+      localidad: 'Buenos Aires',
       telefono: '',
-      email: ''
+      email: '',
+      descripcion: '',  // Campo adicional para empresa
+      enlaces: '',  // Campo adicional para empresa
+      isEmpresa: false,  // Nuevo campo para verificar si es empresa
+      provinceChoices: [
+      'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
+      'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza',
+      'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis',
+      'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego', 'Tucumán'
+      ]
     };
   },
   mounted() {
@@ -79,6 +93,11 @@ export default {
         this.localidad = response.data.perfil ? response.data.perfil.localidad || '' : '';
         this.telefono = response.data.perfil ? response.data.perfil.telefono || '' : '';
         this.email = response.data.email || ''; // Email no editable
+        this.isEmpresa = response.data.perfil.is_empresa || false;  // Verificar si es empresa
+        if (this.isEmpresa) {
+          this.descripcion = response.data.perfil.descripcion || '';
+          this.enlaces = response.data.perfil.enlaces || '';
+        }
       } catch (error) {
         console.error('Error al obtener los datos del usuario:', error);
       }
@@ -88,11 +107,16 @@ export default {
 
       const data = {
         perfil: {
-          nombre: this.nombre,
-          localidad: this.localidad,
-          telefono: this.telefono
+          nombre: this.nombre || '',
+          localidad: this.localidad || '',
+          telefono: this.telefono || ''
         }
       };
+
+      if (this.isEmpresa) {
+        data.perfil.descripcion = this.descripcion;
+        data.perfil.enlaces = this.enlaces;
+      }
 
       try {
         const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', data, {
@@ -102,12 +126,13 @@ export default {
         });
         console.log('Perfil actualizado:', response.data);
       } catch (error) {
-        console.error('Error al actualizar el perfil:', error);
+        console.error('Error al actualizar el perfil:', error.response.data);
       }
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* Estilos generales de la página */

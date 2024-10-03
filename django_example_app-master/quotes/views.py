@@ -69,8 +69,20 @@ class UpdateProfileView(APIView):
         else:
             perfil = user.perfil
 
-        # Actualizar Perfil de Usuario
-        serializer = PerfilSerializer(perfil, data=data)
+        # Dividir los datos entre los campos de usuario y de empresa si se proporcionan
+        perfil_data = {
+            'nombre': data.get('nombre', perfil.nombre),
+            'localidad': data.get('localidad', perfil.localidad),
+            'telefono': data.get('telefono', perfil.telefono),
+        }
+
+        # Si se proporciona una descripción, entonces es un perfil de empresa
+        if 'descripcion' in data:
+            perfil_data['descripcion'] = data.get('descripcion', perfil.descripcion)
+            perfil_data['enlaces'] = data.get('enlaces', perfil.enlaces)
+
+        # Actualizar Perfil
+        serializer = PerfilSerializer(perfil, data=perfil_data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'Perfil actualizado correctamente'}, status=status.HTTP_200_OK)

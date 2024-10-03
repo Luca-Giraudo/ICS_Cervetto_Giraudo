@@ -8,6 +8,28 @@ class PerfilSerializer(serializers.ModelSerializer):
     class Meta:
         model = Perfil
         fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono']
+        extra_kwargs = {
+            'nombre': {'required': False},  # Permitir que sea opcional
+            'localidad': {'required': False},  # Permitir que sea opcional
+            'telefono': {'required': False},  # Permitir que sea opcional
+            'descripcion': {'required': False},
+            'enlaces': {'required': False},
+        }
+
+        def update(self, instance, validated_data):
+        # Actualiza solo los campos correspondientes, dependiendo del perfil
+            if 'descripcion' in validated_data:  # Campo exclusivo de empresa
+                instance.descripcion = validated_data.get('descripcion', instance.descripcion)
+            if 'enlaces' in validated_data:  # Campo exclusivo de empresa
+                instance.enlaces = validated_data.get('enlaces', instance.enlaces)
+
+        # Campos comunes
+            instance.nombre = validated_data.get('nombre', instance.nombre)
+            instance.localidad = validated_data.get('localidad', instance.localidad)
+            instance.telefono = validated_data.get('telefono', instance.telefono)
+
+            instance.save()
+            return instance
 
 class CustomUserSerializer(serializers.ModelSerializer):
     perfil = PerfilSerializer()
