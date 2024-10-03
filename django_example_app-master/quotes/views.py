@@ -46,42 +46,44 @@ class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Obtener el perfil del usuario autenticado
+        # Obtener el perfil del usuario autenticado, si existe
         user = request.user
 
-        # Verificar si el usuario tiene un perfil, y crearlo si no existe
-        if not hasattr(user, 'perfil'):
-            perfil = Perfil.objects.create(user=user)
-        else:
-            perfil = user.perfil
+        try:
+            perfil = user.perfil  # Usamos la relación OneToOne
+        except Perfil.DoesNotExist:
+            perfil = None
 
-        # Serializar los datos del perfil
-        perfil_data = PerfilSerializer(perfil).data
-        return Response({'perfil': perfil_data})
+        if perfil:
+            # Serializar los datos del perfil
+            perfil_data = PerfilSerializer(perfil).data
+            return Response({'perfil': perfil_data})
+        else:
+            return Response({'message': 'No se encontró un perfil para este usuario'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request):
         user = request.user
-        data = request.data
+        data = request.data.get('perfil', {})
 
-        # Verificar si el usuario tiene un perfil, y crearlo si no existe
-        if not hasattr(user, 'perfil'):
-            perfil = Perfil.objects.create(user=user)
-        else:
+        # Verificar si el usuario tiene un perfil
+        try:
             perfil = user.perfil
+        except Perfil.DoesNotExist:
+            perfil = Perfil.objects.create(user=user)  # Crear un perfil si no existe
 
-        # Dividir los datos entre los campos de usuario y de empresa si se proporcionan
+        # Actualizar solo si hay datos válidos para el perfil
         perfil_data = {
             'nombre': data.get('nombre', perfil.nombre),
             'localidad': data.get('localidad', perfil.localidad),
             'telefono': data.get('telefono', perfil.telefono),
         }
 
-        # Si se proporciona una descripción, entonces es un perfil de empresa
+        # Si es una empresa, actualizar también los campos de empresa
         if 'descripcion' in data:
             perfil_data['descripcion'] = data.get('descripcion', perfil.descripcion)
             perfil_data['enlaces'] = data.get('enlaces', perfil.enlaces)
 
-        # Actualizar Perfil
+        # Actualizar el perfil con los datos enviados
         serializer = PerfilSerializer(perfil, data=perfil_data, partial=True)
         if serializer.is_valid():
             serializer.save()

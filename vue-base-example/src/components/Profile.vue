@@ -25,8 +25,8 @@
           <label for="localidad">Localidad</label>
           <select v-model="localidad" id="localidad">
             <option value="" disabled>Selecciona tu provincia</option>
-            <option v-for="province in provinceChoices" :key="province" :value="province">
-              {{ province }}
+            <option v-for="choice in provinceChoices" :value="choice[0]" :key="choice[0]" >
+              {{ choice[1] }}
             </option>
           </select>
         </div>
@@ -57,17 +57,20 @@ export default {
   data() {
     return {
       nombre: '',
-      localidad: 'Buenos Aires',
+      localidad: 'X',
       telefono: '',
       email: '',
       descripcion: '',  // Campo adicional para empresa
       enlaces: '',  // Campo adicional para empresa
-      isEmpresa: false,  // Nuevo campo para verificar si es empresa
+      isEmpresa: false,  // Campo para verificar si es empresa
       provinceChoices: [
-      'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
-      'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza',
-      'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis',
-      'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego', 'Tucumán'
+        ['B', 'Buenos Aires'], ['K', 'Catamarca'], ['H', 'Chaco'], ['U', 'Chubut'],
+        ['C', 'Ciudad Autónoma de Buenos Aires'], ['X', 'Córdoba'], ['W', 'Corrientes'],
+        ['E', 'Entre Ríos'], ['P', 'Formosa'], ['Y', 'Jujuy'], ['L', 'La Pampa'],
+        ['F', 'La Rioja'], ['M', 'Mendoza'], ['N', 'Misiones'], ['Q', 'Neuquén'],
+        ['R', 'Río Negro'], ['A', 'Salta'], ['J', 'San Juan'], ['D', 'San Luis'],
+        ['Z', 'Santa Cruz'], ['S', 'Santa Fe'], ['G', 'Santiago del Estero'],
+        ['V', 'Tierra del Fuego'], ['T', 'Tucumán']
       ]
     };
   },
@@ -78,7 +81,6 @@ export default {
     async fetchUserData() {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token:', token);  // Verifica el token
         if (!token) {
           throw new Error('Token no encontrado');
         }
@@ -90,10 +92,10 @@ export default {
 
         // Rellenar los datos del formulario con la respuesta
         this.nombre = response.data.perfil ? response.data.perfil.nombre || '' : '';
-        this.localidad = response.data.perfil ? response.data.perfil.localidad || '' : '';
+        this.localidad = response.data.perfil ? response.data.perfil.localidad || 'X' : 'X';
         this.telefono = response.data.perfil ? response.data.perfil.telefono || '' : '';
-        this.email = response.data.email || ''; // Email no editable
-        this.isEmpresa = response.data.perfil.is_empresa || false;  // Verificar si es empresa
+        this.email = response.data.email || '';
+        this.isEmpresa = response.data.perfil.is_empresa || false;
         if (this.isEmpresa) {
           this.descripcion = response.data.perfil.descripcion || '';
           this.enlaces = response.data.perfil.enlaces || '';
@@ -106,20 +108,19 @@ export default {
       const token = localStorage.getItem('token');  // Obtener el token
 
       const data = {
-        perfil: {
-          nombre: this.nombre || '',
-          localidad: this.localidad || '',
-          telefono: this.telefono || ''
-        }
+        nombre: this.nombre || '',
+        localidad: this.localidad || '',
+        telefono: this.telefono || ''
       };
 
+      // Si el usuario es una empresa, agregar los campos correspondientes
       if (this.isEmpresa) {
-        data.perfil.descripcion = this.descripcion;
-        data.perfil.enlaces = this.enlaces;
+        data.descripcion = this.descripcion || '';
+        data.enlaces = this.enlaces || '';
       }
 
       try {
-        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', data, {
+        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', { perfil: data }, {
           headers: {
             Authorization: `Token ${token}`  // Incluir el token en el encabezado
           }
@@ -132,7 +133,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 /* Estilos generales de la página */
