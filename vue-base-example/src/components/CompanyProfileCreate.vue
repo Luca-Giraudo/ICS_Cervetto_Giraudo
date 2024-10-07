@@ -45,14 +45,22 @@ export default {
   methods: {
     createCompanyProfile() {
       // Realiza la solicitud POST a la API
-      axios.post('/api/perfil-empresa/', this.companyProfile)
+      axios.post('http://localhost:8000/api/perfil-empresa/', this.companyProfile, {
+          headers: {
+            Authorization: `Token ${localStorage.getItem('token')}`
+          }
+        })
         .then(() => {
           alert('Perfil de empresa creado exitosamente');
           this.$router.push('/profile');  // Redirige al perfil de usuario después de crear el perfil de empresa
         })
         .catch(error => {
-          console.error('Error al crear el perfil de empresa:', error);
-          alert('Ocurrió un error al crear el perfil de empresa.');
+          console.error('Error al crear el perfil de empresa:', error.response.data);
+          if (error.response.status === 400) {
+            alert('Ya tienes un perfil de empresa.');
+          } else {
+            alert('Ocurrió un error al crear el perfil de empresa.');
+          }
         });
     }
   }
