@@ -25,22 +25,50 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class CreateEmpresaView(APIView):
+class UpdateEmpresaProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request):
         user = request.user
-        if user.perfil_empresa:
-            return Response({"error": "El perfil de empresa ya ha sido creado."}, status=400)
 
-        data = request.data
-        serializer = PerfilSerializer(data=data)
+        # Verificar si el usuario ya tiene un perfil de empresa
+        try:
+            perfil = Perfil.objects.get(user=user, descripcion__isnull=False)  # Perfil con descripción indica empresa
+        except Perfil.DoesNotExist:
+            perfil = None
+
+        if perfil:
+            # Serializar los datos del perfil de empresa
+            perfil_data = PerfilSerializer(perfil).data
+            return Response({'perfil': perfil_data})
+        else:
+            return Response({'message': 'No se encontró un perfil de empresa para este usuario'}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request):
+        user = request.user
+        data = request.data.get('perfil', {})
+
+        # Verificar si el perfil de empresa existe, de lo contrario crearlo
+        try:
+            perfil = Perfil.objects.get(user=user, descripcion__isnull=False)
+        except Perfil.DoesNotExist:
+            perfil = Perfil.objects.create(user=user)  # Crear perfil si no existe
+
+        # Actualizar solo si hay datos válidos para el perfil
+        perfil_data = {
+            'nombre': data.get('nombre', perfil.nombre),
+            'descripcion': data.get('descripcion', perfil.descripcion),
+            'enlaces': data.get('enlaces', perfil.enlaces),
+            'localidad': data.get('localidad', perfil.localidad),
+            'telefono': data.get('telefono', perfil.telefono),
+        }
+
+        # Actualizar el perfil de empresa con los datos enviados
+        serializer = PerfilSerializer(perfil, data=perfil_data, partial=True)
         if serializer.is_valid():
-            perfil_empresa = serializer.save()
-            user.perfil_empresa = perfil_empresa
-            user.save()
-            return Response({"message": "Perfil de empresa creado exitosamente"}, status=201)
-        return Response(serializer.errors, status=400)
+            serializer.save()
+            return Response({'message': 'Perfil de empresa actualizado correctamente'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]

@@ -1,23 +1,35 @@
 <template>
-  <div class="profile-page">
+  <div class="empresa-profile-page">
     <!-- Cabecera -->
     <header class="header">
       <h1 class="logo">ServiPro</h1>
     </header>
 
-    <!-- Contenedor del perfil -->
+    <!-- Contenedor del perfil de empresa -->
     <div class="profile-container">
       <!-- Imagen de perfil -->
       <div class="profile-avatar">
         <img src="@/assets/perfilplaceholder.png" alt="Imagen de perfil">
       </div>
 
-      <!-- Formulario de perfil -->
-      <form @submit.prevent="updateUser" class="profile-form">
-        <!-- Nombre -->
+      <!-- Formulario de perfil de empresa -->
+      <form @submit.prevent="updateEmpresaProfile" class="profile-form">
+        <!-- Nombre de la Empresa -->
         <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input type="text" v-model="nombre" id="nombre" placeholder="Introduce tu nombre" />
+          <label for="nombre">Nombre de la Empresa</label>
+          <input type="text" v-model="nombre" id="nombre" placeholder="Introduce el nombre de la empresa" />
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea v-model="descripcion" id="descripcion" maxlength="144" placeholder="Introduce una descripción"></textarea>
+        </div>
+
+        <!-- Enlaces alternos -->
+        <div class="form-group">
+          <label for="enlaces">Enlaces alternos</label>
+          <input type="text" v-model="enlaces" id="enlaces" placeholder="Introduce enlaces" />
         </div>
 
         <!-- Localidad -->
@@ -25,7 +37,7 @@
           <label for="localidad">Localidad</label>
           <select v-model="localidad" id="localidad">
             <option value="" disabled>Selecciona tu provincia</option>
-            <option v-for="choice in provinceChoices" :value="choice[0]" :key="choice[0]" >
+            <option v-for="choice in provinceChoices" :value="choice[0]" :key="choice[0]">
               {{ choice[1] }}
             </option>
           </select>
@@ -37,17 +49,12 @@
           <input type="text" v-model="telefono" id="telefono" placeholder="Introduce tu teléfono" />
         </div>
 
-        <!-- Email (no editable) -->
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" v-model="email" id="email" readonly />
-        </div>
-
         <!-- Botón de guardar -->
         <button type="submit" class="submit-btn">Guardar Cambios</button>
 
-        <button type="button" class="empresa-btn" @click="irAPerfilEmpresa">
-          Crear/Modificar Perfil de Empresa
+        <!-- Botón para volver al perfil de usuario -->
+        <button type="button" class="usuario-btn" @click="irAPerfilUsuario">
+          Volver al Perfil de Usuario
         </button>
       </form>
     </div>
@@ -61,12 +68,10 @@ export default {
   data() {
     return {
       nombre: '',
+      descripcion: '',
+      enlaces: '',
       localidad: 'X',
       telefono: '',
-      email: '',
-      descripcion: '',  // Campo adicional para empresa
-      enlaces: '',  // Campo adicional para empresa
-      isEmpresa: false,  // Campo para verificar si es empresa
       provinceChoices: [
         ['B', 'Buenos Aires'], ['K', 'Catamarca'], ['H', 'Chaco'], ['U', 'Chubut'],
         ['C', 'Ciudad Autónoma de Buenos Aires'], ['X', 'Córdoba'], ['W', 'Corrientes'],
@@ -79,67 +84,75 @@ export default {
     };
   },
   mounted() {
-    this.fetchUserData();
+    this.fetchEmpresaData();
   },
   methods: {
-    async fetchUserData() {
+    async fetchEmpresaData() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('Token no encontrado');
         }
-        const response = await axios.get('http://127.0.0.1:8000/api/profile/', {
+
+        // Obtener datos del perfil de empresa
+        const empresaResponse = await axios.get('http://127.0.0.1:8000/api/update-empresa/', {
           headers: {
-            Authorization: `Token ${token}`,  // Agregar el token al encabezado
+            Authorization: `Token ${token}`,
           },
         });
 
-        // Rellenar los datos del formulario con la respuesta
-        this.nombre = response.data.perfil ? response.data.perfil.nombre || '' : '';
-        this.localidad = response.data.perfil ? response.data.perfil.localidad || 'X' : 'X';
-        this.telefono = response.data.perfil ? response.data.perfil.telefono || '' : '';
-        this.email = response.data.email || '';
-        this.isEmpresa = response.data.perfil.is_empresa || false;
-        if (this.isEmpresa) {
-          this.descripcion = response.data.perfil.descripcion || '';
-          this.enlaces = response.data.perfil.enlaces || '';
+        // Si no hay perfil de empresa, obtener datos del perfil de usuario
+        if (!empresaResponse.data.perfil.nombre) {
+          const userResponse = await axios.get('http://127.0.0.1:8000/api/profile/', {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          });
+
+          // Copiar los datos del perfil de usuario al perfil de empresa
+          this.nombre = userResponse.data.perfil.nombre || '';
+          this.localidad = userResponse.data.perfil.localidad || 'X';
+          this.telefono = userResponse.data.perfil.telefono || '';
+        } else {
+          // Si ya hay perfil de empresa, cargar los datos de la empresa
+          this.nombre = empresaResponse.data.perfil.nombre;
+          this.localidad = empresaResponse.data.perfil.localidad;
+          this.telefono = empresaResponse.data.perfil.telefono;
+          this.descripcion = empresaResponse.data.perfil.descripcion;
+          this.enlaces = empresaResponse.data.perfil.enlaces;
         }
       } catch (error) {
-        console.error('Error al obtener los datos del usuario:', error);
+        console.error('Error al obtener los datos del perfil de empresa:', error);
       }
     },
-    async updateUser() {
+    async updateEmpresaProfile() {
       const token = localStorage.getItem('token');  // Obtener el token
-
       const data = {
         nombre: this.nombre || '',
+        descripcion: this.descripcion || '',
+        enlaces: this.enlaces || '',
         localidad: this.localidad || '',
         telefono: this.telefono || ''
       };
 
-      // Si el usuario es una empresa, agregar los campos correspondientes
-      if (this.isEmpresa) {
-        data.descripcion = this.descripcion || '';
-        data.enlaces = this.enlaces || '';
-      }
-
       try {
-        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', { perfil: data }, {
+        const response = await axios.put('http://127.0.0.1:8000/api/update-empresa/', { perfil: data }, {
           headers: {
             Authorization: `Token ${token}`  // Incluir el token en el encabezado
           }
         });
-        console.log('Perfil actualizado:', response.data);
+        console.log('Perfil de empresa actualizado:', response.data);
       } catch (error) {
-        console.error('Error al actualizar el perfil:', error.response.data);
+        console.error('Error al actualizar el perfil de empresa:', error.response.data);
       }
     },
-    irAPerfilEmpresa() {
-      this.$router.push('/empresa-profile'); // Navegación al componente de perfil de empresa
+    irAPerfilUsuario() {
+      this.$router.push('/profile');  // Navegar de vuelta al perfil de usuario
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* Estilos generales de la página */
@@ -204,13 +217,24 @@ export default {
   font-weight: 600;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   width: 100%;
   height: 31px;
   padding: 5px;
   border: 2px solid #767676;
   border-radius: 6px;
   background-color: #FFFFFF;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 5px;
+  border: 2px solid #767676;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  min-height: 80px;
+  resize: vertical;
 }
 
 .form-group input[readonly] {
@@ -232,13 +256,25 @@ export default {
   margin-top: 20px;
 }
 
-/* Botón de empresa */
-.empresa-btn {
+/* Botón de perfil de usuario */
+.usuario-btn {
   width: 100%;
   background-color: #1815AA;
   color: white;
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Campo adicional de descripción */
+.form-group.description-group textarea {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Campo de enlaces */
+.form-group.enlaces-group input {
+  font-size: 14px;
 }
 </style>
