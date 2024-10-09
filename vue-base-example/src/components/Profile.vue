@@ -7,9 +7,11 @@
 
     <!-- Contenedor del perfil -->
     <div class="profile-container">
+
       <!-- Imagen de perfil -->
-      <div class="profile-avatar">
-        <img src="@/assets/perfilplaceholder.png" alt="Imagen de perfil">
+      <div class="profile-avatar" @click="triggerFileInput">
+        <img :src="imageUrl" alt="Imagen de perfil" />
+        <input type="file" ref="fileInput" @change="onFileSelected" style="display: none;" />
       </div>
 
       <!-- Formulario de perfil -->
@@ -66,6 +68,8 @@ export default {
       email: '',
       descripcion: '',  // Campo adicional para empresa
       enlaces: '',  // Campo adicional para empresa
+      imageUrl: require('@/assets/perfilplaceholder.png'),  // Placeholder para la imagen de perfil
+      imageFile: null,
       isEmpresa: false,  // Campo para verificar si es empresa
       provinceChoices: [
         ['B', 'Buenos Aires'], ['K', 'Catamarca'], ['H', 'Chaco'], ['U', 'Chubut'],
@@ -99,6 +103,7 @@ export default {
         this.localidad = response.data.perfil ? response.data.perfil.localidad || 'X' : 'X';
         this.telefono = response.data.perfil ? response.data.perfil.telefono || '' : '';
         this.email = response.data.email || '';
+        this.imageUrl = response.data.perfil.imagen || '@/assets/perfilplaceholder.png';  // Establecer imagen
         this.isEmpresa = response.data.perfil.is_empresa || false;
         if (this.isEmpresa) {
           this.descripcion = response.data.perfil.descripcion || '';
@@ -108,25 +113,40 @@ export default {
         console.error('Error al obtener los datos del usuario:', error);
       }
     },
+
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    onFileSelected(event) {
+      const file = event.target.files[0];
+      this.imageFile = file;
+      this.imageUrl = URL.createObjectURL(file);  // Mostrar vista previa de la imagen
+    },
+
     async updateUser() {
       const token = localStorage.getItem('token');  // Obtener el token
+      const formData = new FormData();  // Usar FormData para manejar imágenes y otros datos
 
-      const data = {
-        nombre: this.nombre || '',
-        localidad: this.localidad || '',
-        telefono: this.telefono || ''
-      };
+      formData.append('nombre', this.nombre || '');
+      formData.append('localidad', this.localidad || '');
+      formData.append('telefono', this.telefono || '');
+
+      // Si hay un archivo de imagen seleccionado, adjuntarlo al formulario
+      if (this.imageFile) {
+        formData.append('imagen', this.imageFile);
+      }
 
       // Si el usuario es una empresa, agregar los campos correspondientes
       if (this.isEmpresa) {
-        data.descripcion = this.descripcion || '';
-        data.enlaces = this.enlaces || '';
+        formData.append('descripcion', this.descripcion || '');
+        formData.append('enlaces', this.enlaces || '');
       }
 
       try {
-        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', { perfil: data }, {
+        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', formData, {
           headers: {
-            Authorization: `Token ${token}`  // Incluir el token en el encabezado
+            Authorization: `Token ${token}`,  // Incluir el token en el encabezado
+            'Content-Type': 'multipart/form-data',  // Importante para subir archivos
           }
         });
         console.log('Perfil actualizado:', response.data);
@@ -140,6 +160,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 /* Estilos generales de la página */

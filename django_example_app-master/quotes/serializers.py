@@ -7,13 +7,14 @@ from django.core.exceptions import ValidationError
 class PerfilSerializer(serializers.ModelSerializer):
     class Meta:
         model = Perfil
-        fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono']
+        fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono', 'imagen']
         extra_kwargs = {
             'nombre': {'required': False},  # Permitir que sea opcional
             'localidad': {'required': False},  # Permitir que sea opcional
             'telefono': {'required': False},  # Permitir que sea opcional
             'descripcion': {'required': False},
             'enlaces': {'required': False},
+            'imagen': {'required': False},
         }
 
         def update(self, instance, validated_data):

@@ -8,8 +8,9 @@
     <!-- Contenedor del perfil de empresa -->
     <div class="profile-container">
       <!-- Imagen de perfil -->
-      <div class="profile-avatar">
-        <img src="@/assets/perfilplaceholder.png" alt="Imagen de perfil">
+      <div class="profile-avatar" @click="triggerFileInput">
+        <img :src="imageUrl" alt="Imagen de perfil" />
+        <input type="file" ref="fileInput" @change="onFileSelected" style="display: none;" />
       </div>
 
       <!-- Formulario de perfil de empresa -->
@@ -72,6 +73,8 @@ export default {
       enlaces: '',
       localidad: 'X',
       telefono: '',
+      imageUrl: require('@/assets/perfilplaceholder.png'),   // Imagen por defecto
+      imageFile: null,  // Archivo de la imagen seleccionada
       provinceChoices: [
         ['B', 'Buenos Aires'], ['K', 'Catamarca'], ['H', 'Chaco'], ['U', 'Chubut'],
         ['C', 'Ciudad Autónoma de Buenos Aires'], ['X', 'Córdoba'], ['W', 'Corrientes'],
@@ -94,14 +97,12 @@ export default {
           throw new Error('Token no encontrado');
         }
 
-        // Obtener datos del perfil de empresa
         const empresaResponse = await axios.get('http://127.0.0.1:8000/api/update-empresa/', {
           headers: {
             Authorization: `Token ${token}`,
           },
         });
 
-        // Si no hay perfil de empresa, obtener datos del perfil de usuario
         if (!empresaResponse.data.perfil.nombre) {
           const userResponse = await axios.get('http://127.0.0.1:8000/api/profile/', {
             headers: {
@@ -109,36 +110,53 @@ export default {
             },
           });
 
-          // Copiar los datos del perfil de usuario al perfil de empresa
           this.nombre = userResponse.data.perfil.nombre || '';
           this.localidad = userResponse.data.perfil.localidad || 'X';
           this.telefono = userResponse.data.perfil.telefono || '';
+          this.imageUrl = userResponse.data.perfil.imagen ? `http://127.0.0.1:8000${userResponse.data.perfil.imagen}` : require('@/assets/perfilplaceholder.png');  // Cargar imagen
         } else {
-          // Si ya hay perfil de empresa, cargar los datos de la empresa
           this.nombre = empresaResponse.data.perfil.nombre;
           this.localidad = empresaResponse.data.perfil.localidad;
           this.telefono = empresaResponse.data.perfil.telefono;
           this.descripcion = empresaResponse.data.perfil.descripcion;
           this.enlaces = empresaResponse.data.perfil.enlaces;
+          this.imageUrl = empresaResponse.data.perfil.imagen ? `http://127.0.0.1:8000${empresaResponse.data.perfil.imagen}` : require('@/assets/perfilplaceholder.png');  // Cargar imagen
         }
       } catch (error) {
         console.error('Error al obtener los datos del perfil de empresa:', error);
       }
     },
+
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+
+    onFileSelected(event) {
+      const file = event.target.files[0];
+      this.imageFile = file;
+      this.imageUrl = URL.createObjectURL(file);  // Mostrar vista previa de la imagen
+    },
+
     async updateEmpresaProfile() {
       const token = localStorage.getItem('token');  // Obtener el token
-      const data = {
-        nombre: this.nombre || '',
-        descripcion: this.descripcion || '',
-        enlaces: this.enlaces || '',
-        localidad: this.localidad || '',
-        telefono: this.telefono || ''
-      };
+      const formData = new FormData();  // Usar FormData para manejar imágenes y otros datos
+
+      formData.append('nombre', this.nombre || '');
+      formData.append('descripcion', this.descripcion || '');
+      formData.append('enlaces', this.enlaces || '');
+      formData.append('localidad', this.localidad || '');
+      formData.append('telefono', this.telefono || '');
+
+      // Si hay un archivo de imagen seleccionado, adjuntarlo al formulario
+      if (this.imageFile) {
+        formData.append('imagen', this.imageFile);
+      }
 
       try {
-        const response = await axios.put('http://127.0.0.1:8000/api/update-empresa/', { perfil: data }, {
+        const response = await axios.put('http://127.0.0.1:8000/api/update-empresa/', formData, {
           headers: {
-            Authorization: `Token ${token}`  // Incluir el token en el encabezado
+            Authorization: `Token ${token}`,  // Incluir el token en el encabezado
+            'Content-Type': 'multipart/form-data',  // Importante para subir archivos
           }
         });
         console.log('Perfil de empresa actualizado:', response.data);
@@ -146,13 +164,13 @@ export default {
         console.error('Error al actualizar el perfil de empresa:', error.response.data);
       }
     },
+
     irAPerfilUsuario() {
       this.$router.push('/profile');  // Navegar de vuelta al perfil de usuario
     }
   }
 };
 </script>
-
 
 <style scoped>
 /* Estilos generales de la página */

@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from quotes.views import index, main, RegisterAPI, LoginAPI, UserDetailAPI, UserProfileView, UpdateEmpresaProfileView, UpdateProfileView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +29,8 @@ urlpatterns = [
     path('api/profile/', UserProfileView.as_view(), name='user_profile'),
     path('api/update-empresa/', UpdateEmpresaProfileView.as_view(), name='update_empresa'),
     path('api/update-profile/', UpdateProfileView.as_view(), name='update_profile')
-
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

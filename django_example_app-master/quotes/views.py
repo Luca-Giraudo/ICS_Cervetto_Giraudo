@@ -30,15 +30,12 @@ class UpdateEmpresaProfileView(APIView):
 
     def get(self, request):
         user = request.user
-
-        # Verificar si el usuario ya tiene un perfil de empresa
         try:
-            perfil = Perfil.objects.get(user=user, descripcion__isnull=False)  # Perfil con descripción indica empresa
+            perfil = Perfil.objects.get(user=user, descripcion__isnull=False)
         except Perfil.DoesNotExist:
             perfil = None
 
         if perfil:
-            # Serializar los datos del perfil de empresa
             perfil_data = PerfilSerializer(perfil).data
             return Response({'perfil': perfil_data})
         else:
@@ -46,27 +43,28 @@ class UpdateEmpresaProfileView(APIView):
 
     def put(self, request):
         user = request.user
-        data = request.data.get('perfil', {})
+        data = request.data
+        imagen = request.FILES.get('imagen')  # Obtener la imagen del request
 
-        # Verificar si el perfil de empresa existe, de lo contrario crearlo
         try:
             perfil = Perfil.objects.get(user=user, descripcion__isnull=False)
         except Perfil.DoesNotExist:
-            perfil = Perfil.objects.create(user=user)  # Crear perfil si no existe
+            perfil = Perfil.objects.create(user=user)
 
-        # Actualizar solo si hay datos válidos para el perfil
         perfil_data = {
             'nombre': data.get('nombre', perfil.nombre),
-            'descripcion': data.get('descripcion', perfil.descripcion),
-            'enlaces': data.get('enlaces', perfil.enlaces),
             'localidad': data.get('localidad', perfil.localidad),
             'telefono': data.get('telefono', perfil.telefono),
+            'descripcion': data.get('descripcion', perfil.descripcion),
+            'enlaces': data.get('enlaces', perfil.enlaces)
         }
 
-        # Actualizar el perfil de empresa con los datos enviados
         serializer = PerfilSerializer(perfil, data=perfil_data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            if imagen:  # Guardar la imagen si fue enviada
+                perfil.imagen = imagen
+                perfil.save()
             return Response({'message': 'Perfil de empresa actualizado correctamente'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,16 +72,14 @@ class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Obtener el perfil del usuario autenticado, si existe
         user = request.user
 
         try:
-            perfil = user.perfil  # Usamos la relación OneToOne
+            perfil = user.perfil
         except Perfil.DoesNotExist:
             perfil = None
 
         if perfil:
-            # Serializar los datos del perfil
             perfil_data = PerfilSerializer(perfil).data
             return Response({'perfil': perfil_data})
         else:
@@ -91,32 +87,33 @@ class UpdateProfileView(APIView):
 
     def put(self, request):
         user = request.user
-        data = request.data.get('perfil', {})
+        data = request.data
+        imagen = request.FILES.get('imagen')  # Obtener la imagen del request
 
-        # Verificar si el usuario tiene un perfil
         try:
             perfil = user.perfil
         except Perfil.DoesNotExist:
             perfil = Perfil.objects.create(user=user)  # Crear un perfil si no existe
 
-        # Actualizar solo si hay datos válidos para el perfil
         perfil_data = {
             'nombre': data.get('nombre', perfil.nombre),
             'localidad': data.get('localidad', perfil.localidad),
             'telefono': data.get('telefono', perfil.telefono),
         }
 
-        # Si es una empresa, actualizar también los campos de empresa
         if 'descripcion' in data:
             perfil_data['descripcion'] = data.get('descripcion', perfil.descripcion)
             perfil_data['enlaces'] = data.get('enlaces', perfil.enlaces)
 
-        # Actualizar el perfil con los datos enviados
         serializer = PerfilSerializer(perfil, data=perfil_data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            if imagen:  # Guardar la imagen si fue enviada
+                perfil.imagen = imagen
+                perfil.save()
             return Response({'message': 'Perfil actualizado correctamente'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer

@@ -47,6 +47,7 @@ class Perfil(models.Model):
     enlaces = models.URLField(max_length=200, blank=True, null=True)
     localidad = models.CharField(max_length=100, choices=PROVINCE_CHOICES, blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, null=True)
+    imagen = models.ImageField(upload_to='perfil_images/', null=True, blank=True)
 
     def __str__(self):
         return self.nombre
