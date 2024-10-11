@@ -48,8 +48,9 @@
         <!-- Botón de guardar -->
         <button type="submit" class="submit-btn">Guardar Cambios</button>
 
+        <!-- Botón para volver al perfil de empresa -->
         <button type="button" class="empresa-btn" @click="irAPerfilEmpresa">
-          Crear/Modificar Perfil de Empresa
+          Perfil de Empresa
         </button>
       </form>
     </div>
@@ -86,6 +87,7 @@ export default {
     this.fetchUserData();
   },
   methods: {
+    // Obtener datos del perfil de usuario
     async fetchUserData() {
       try {
         const token = localStorage.getItem('token');
@@ -114,15 +116,19 @@ export default {
       }
     },
 
+    // Mostrar el input para seleccionar imagen
     triggerFileInput() {
       this.$refs.fileInput.click();
     },
+
+    // Manejar la selección de archivo
     onFileSelected(event) {
       const file = event.target.files[0];
       this.imageFile = file;
       this.imageUrl = URL.createObjectURL(file);  // Mostrar vista previa de la imagen
     },
 
+    // Actualizar perfil de usuario
     async updateUser() {
       const token = localStorage.getItem('token');  // Obtener el token
       const formData = new FormData();  // Usar FormData para manejar imágenes y otros datos
@@ -154,13 +160,13 @@ export default {
         console.error('Error al actualizar el perfil:', error.response.data);
       }
     },
+
     irAPerfilEmpresa() {
-      this.$router.push('/empresa-profile'); // Navegación al componente de perfil de empresa
+      this.$router.push('/empresa-profile'); // Navegar al perfil de empresa
     }
   }
 };
 </script>
-
 
 <style scoped>
 /* Estilos generales de la página */

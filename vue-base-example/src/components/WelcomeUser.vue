@@ -1,27 +1,25 @@
 <template>
   <div v-if="!loading" class="welcome-container">
-    <!-- Nombre de la página "Servipro" arriba a la izquierda -->
+    <!-- Header -->
     <div class="header">
       <div class="logo-left">
         <h2>Servipro</h2>
       </div>
-
-      <!-- Botón de cerrar sesión centrado arriba -->
       <div class="logout-center">
         <button @click="logout">Cerrar sesión</button>
       </div>
     </div>
 
     <div v-if="user" class="content">
-      <!-- Logo del proyecto centrado -->
+      <!-- Logo del proyecto -->
       <div class="logo-container">
         <img src="@/assets/logocompleto.png" alt="Logo de Servipro" class="project-logo">
       </div>
 
-      <!-- Mensaje de bienvenida con el nombre del usuario -->
+      <!-- Mensaje de bienvenida -->
       <h1>Bienvenido, {{ user.first_name }}!</h1>
 
-      <!-- Barra de búsqueda centrada -->
+      <!-- Buscador -->
       <div class="search-bar">
         <input type="text" class="input" placeholder="Buscar...">
         <span class="icon">🔍</span>
@@ -30,11 +28,28 @@
       <!-- Botón para ir al perfil -->
       <button @click="goToProfile" class="profile-btn">Ir al Perfil</button>
 
-      <!-- Texto de "🔥Populares" pegado a la izquierda -->
+      <!-- Populares -->
       <p class="populares-text">🔥 Populares</p>
+
+      <!-- Listado de empresas en formato de cards -->
+      <div class="empresa-list">
+        <div v-for="empresa in empresas" :key="empresa.id" class="empresa-card" @click="irAlPerfilDeEmpresa(empresa.id)">
+          <img :src="empresa.imagen ? empresa.imagen : require('@/assets/perfilplaceholder.png')" alt="Imagen de empresa" class="empresa-avatar" />
+          <div class="empresa-details">
+            <h3>{{ empresa.nombre }}</h3>
+            <p>{{ empresa.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination">
+        <button @click="cambiarPagina('prev')" :disabled="!paginacion.previous">Anterior</button>
+        <button @click="cambiarPagina('next')" :disabled="!paginacion.next">Siguiente</button>
+      </div>
     </div>
 
-    <!-- Mensaje en caso de no estar logueado -->
+    <!-- Mensaje si no está logueado -->
     <div v-else>
       <h1>Inicia sesión o regístrate</h1>
       <router-link to="/login">Iniciar sesión</router-link> |
@@ -54,11 +69,17 @@ export default {
   data() {
     return {
       user: null,
-      loading: true
+      loading: true,
+      empresas: [],
+      paginacion: {
+        next: null,
+        previous: null,
+      },
     };
   },
   async mounted() {
     await this.fetchUserData();
+    await this.fetchEmpresas();
   },
   methods: {
     async fetchUserData() {
@@ -72,7 +93,6 @@ export default {
             Authorization: `Token ${token}`,
           },
         });
-        console.log('Datos del usuario:', response.data);
         this.user = response.data;
       } catch (error) {
         console.error('Error al obtener los datos del usuario:', error);
@@ -81,22 +101,51 @@ export default {
         this.loading = false;
       }
     },
+    async fetchEmpresas(url = 'http://127.0.0.1:8000/api/empresas/') {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        this.empresas = response.data.results.map(empresa => ({
+          ...empresa,
+          imagen: `http://127.0.0.1:8000${empresa.imagen}`  // Construir la URL completa de la imagen
+        }));
+        this.paginacion.next = response.data.next;
+        this.paginacion.previous = response.data.previous;
+      } catch (error) {
+        console.error('Error al obtener los perfiles de empresa:', error);
+      }
+    },
+    cambiarPagina(direccion) {
+      const url = direccion === 'next' ? this.paginacion.next : this.paginacion.previous;
+      if (url) {
+        this.fetchEmpresas(url);
+      }
+    },
+    irAlPerfilDeEmpresa(empresaId) {
+      this.$router.push(`/empresa-profile/${empresaId}`);
+    },
     logout() {
       localStorage.removeItem('token');
       this.user = null;
       this.$router.push('/');
     },
     goToProfile() {
-      this.$router.push('/profile');  // Redirige a la página de perfil
+      this.$router.push('/profile');
     },
   },
 };
 </script>
 
 <style scoped>
+/* Estilos ajustados al diseño que proporcionaste */
 .welcome-container {
-  position: relative;
-  text-align: center;
+  width: 1440px;
+  height: 1024px;
+  background: #FFFFFF;
 }
 
 .header {
@@ -108,13 +157,7 @@ export default {
 .logo-left h2 {
   font-size: 32px;
   font-weight: bold;
-  color: #333;
-}
-
-.logout-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: #1815AA;
 }
 
 .logout-center button {
@@ -124,25 +167,22 @@ export default {
   cursor: pointer;
 }
 
-.logout-center button:hover {
-  background-color: #d32f2f;
-}
-
 .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-top: 25px;
 }
 
 .project-logo {
   width: 300px;
   height: 300px;
-  margin: 20px 0;
 }
 
 .search-bar {
   margin-top: 20px;
   width: 280px;
   position: relative;
-  margin: 0 auto;
 }
 
 .profile-btn {
@@ -150,62 +190,48 @@ export default {
   color: white;
   padding: 10px 20px;
   font-size: 16px;
-  border: none;
-  cursor: pointer;
   margin-top: 20px;
-}
-
-.profile-btn:hover {
-  background-color: #45a049;
-}
-
-.input-container {
-  margin-top: 20px;
-  width: 220px;
-  position: relative;
-  margin: 0 auto;
-}
-
-.input {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  border: 2.5px solid black;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.input:focus {
-  outline: none;
-  border: 0.5px solid black;
-  box-shadow: -5px -5px 0px black;
-}
-
-.icon {
-  position: absolute;
-  right: 10px;
-  top: calc(50% + 5px);
-  transform: translateY(calc(-50% - 5px));
-}
-
-.input-container:hover > .icon {
-  animation: anim 1s linear infinite;
-}
-
-@keyframes anim {
-  0%, 100% {
-    transform: translateY(calc(-50% - 5px)) scale(1);
-  }
-  50% {
-    transform: translateY(calc(-50% - 5px)) scale(1.1);
-  }
 }
 
 .populares-text {
-  text-align: left;
-  margin-top: 30px;
-  margin-left: 20px;
   font-size: 20px;
+  color: #1815AA;
+}
+
+.empresa-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 1282px;
+  margin-top: 50px;
+}
+
+.empresa-card {
+  width: 404px;
+  height: 366px;
+  border-radius: 8px;
+  background: #F7F7F7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  cursor: pointer;
+}
+
+.empresa-avatar {
+  width: 404px;
+  height: 250px;
+  border-radius: 8px;
+}
+
+.empresa-details {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 </style>

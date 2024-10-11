@@ -50,12 +50,12 @@
           <input type="text" v-model="telefono" id="telefono" placeholder="Introduce tu teléfono" />
         </div>
 
-        <!-- Botón de guardar -->
+        <!-- Botón de guardar cambios -->
         <button type="submit" class="submit-btn">Guardar Cambios</button>
 
         <!-- Botón para volver al perfil de usuario -->
         <button type="button" class="usuario-btn" @click="irAPerfilUsuario">
-          Volver al Perfil de Usuario
+          Perfil de Usuario
         </button>
       </form>
     </div>
@@ -87,90 +87,93 @@ export default {
     };
   },
   mounted() {
-    this.fetchEmpresaData();
+    this.fetchUserData();  // Cargar datos del perfil de empresa al montar el componente
   },
   methods: {
-    async fetchEmpresaData() {
+    async fetchUserData() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('Token no encontrado');
         }
 
-        const empresaResponse = await axios.get('http://127.0.0.1:8000/api/update-empresa/', {
+        const response = await axios.get('http://127.0.0.1:8000/api/profile/', {
           headers: {
             Authorization: `Token ${token}`,
           },
         });
 
-        if (!empresaResponse.data.perfil.nombre) {
-          const userResponse = await axios.get('http://127.0.0.1:8000/api/profile/', {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          });
+        // Rellenar los datos del formulario con la respuesta
+        this.nombre = response.data.perfil ? response.data.perfil.nombre || '' : '';
+        this.localidad = response.data.perfil ? response.data.perfil.localidad || 'X' : 'X';
+        this.telefono = response.data.perfil ? response.data.perfil.telefono || '' : '';
+        this.imageUrl = response.data.perfil.imagen || '@/assets/perfilplaceholder.png';  // Establecer imagen
 
-          this.nombre = userResponse.data.perfil.nombre || '';
-          this.localidad = userResponse.data.perfil.localidad || 'X';
-          this.telefono = userResponse.data.perfil.telefono || '';
-          this.imageUrl = userResponse.data.perfil.imagen ? `http://127.0.0.1:8000${userResponse.data.perfil.imagen}` : require('@/assets/perfilplaceholder.png');  // Cargar imagen
-        } else {
-          this.nombre = empresaResponse.data.perfil.nombre;
-          this.localidad = empresaResponse.data.perfil.localidad;
-          this.telefono = empresaResponse.data.perfil.telefono;
-          this.descripcion = empresaResponse.data.perfil.descripcion;
-          this.enlaces = empresaResponse.data.perfil.enlaces;
-          this.imageUrl = empresaResponse.data.perfil.imagen ? `http://127.0.0.1:8000${empresaResponse.data.perfil.imagen}` : require('@/assets/perfilplaceholder.png');  // Cargar imagen
+        // Datos adicionales para el perfil de empresa
+        if (response.data.perfil.descripcion) {
+          this.descripcion = response.data.perfil.descripcion;
         }
+        if (response.data.perfil.enlaces) {
+          this.enlaces = response.data.perfil.enlaces;
+        }
+
       } catch (error) {
         console.error('Error al obtener los datos del perfil de empresa:', error);
       }
     },
 
     triggerFileInput() {
-      this.$refs.fileInput.click();
+      this.$refs.fileInput.click();  // Activar el input de archivo para seleccionar una imagen
     },
 
     onFileSelected(event) {
       const file = event.target.files[0];
       this.imageFile = file;
-      this.imageUrl = URL.createObjectURL(file);  // Mostrar vista previa de la imagen
+      this.imageUrl = URL.createObjectURL(file);  // Mostrar vista previa de la imagen seleccionada
     },
 
     async updateEmpresaProfile() {
-      const token = localStorage.getItem('token');  // Obtener el token
-      const formData = new FormData();  // Usar FormData para manejar imágenes y otros datos
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token no encontrado');
+      }
 
+      const formData = new FormData();  // Usar FormData para manejar imágenes y otros datos
       formData.append('nombre', this.nombre || '');
-      formData.append('descripcion', this.descripcion || '');
-      formData.append('enlaces', this.enlaces || '');
       formData.append('localidad', this.localidad || '');
       formData.append('telefono', this.telefono || '');
+      formData.append('descripcion', this.descripcion || '');
+      formData.append('enlaces', this.enlaces || '');
 
-      // Si hay un archivo de imagen seleccionado, adjuntarlo al formulario
       if (this.imageFile) {
         formData.append('imagen', this.imageFile);
       }
 
       try {
-        const response = await axios.put('http://127.0.0.1:8000/api/update-empresa/', formData, {
+        const response = await axios.put('http://127.0.0.1:8000/api/update-profile/', formData, {
           headers: {
-            Authorization: `Token ${token}`,  // Incluir el token en el encabezado
-            'Content-Type': 'multipart/form-data',  // Importante para subir archivos
+            Authorization: `Token ${token}`,
+            'Content-Type': 'multipart/form-data',
           }
         });
+
         console.log('Perfil de empresa actualizado:', response.data);
+        alert('Perfil de empresa actualizado con éxito');
       } catch (error) {
-        console.error('Error al actualizar el perfil de empresa:', error.response.data);
+        console.error('Error al modificar el perfil de empresa:', error.response.data);
+        if (error.response && error.response.status === 404) {
+          alert('No se encontró el perfil de empresa.');
+        }
       }
     },
 
     irAPerfilUsuario() {
-      this.$router.push('/profile');  // Navegar de vuelta al perfil de usuario
+      this.$router.push('/profile');  // Navegar al perfil de usuario
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* Estilos generales de la página */
