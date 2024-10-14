@@ -1,9 +1,8 @@
 <template>
   <div class="empresa-profile-page">
-    <!-- Cabecera -->
-    <header class="header">
-      <h1 class="logo">ServiPro</h1>
-    </header>
+    <router-link to="/welcome-user" class="servipro-link">
+        ServiPro
+    </router-link>
 
     <!-- Contenedor del perfil de empresa -->
     <div class="profile-container">
@@ -17,8 +16,8 @@
       <form @submit.prevent="updateEmpresaProfile" class="profile-form">
         <!-- Nombre de la Empresa -->
         <div class="form-group">
-          <label for="nombre">Nombre de la Empresa</label>
-          <input type="text" v-model="nombre" id="nombre" placeholder="Introduce el nombre de la empresa" />
+          <label for="nombre">Nombre</label>
+          <input type="text" v-model="nombre" id="nombre" placeholder="Introduce el nombre" />
         </div>
 
         <!-- Descripción -->
@@ -177,19 +176,26 @@ export default {
 
 <style scoped>
 /* Estilos generales de la página */
-.profile-page {
-  width: 100%;
-  height: 100vh;
-  background-color: #FFFFFF;
+.empresa-profile-page {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Altura mínima para cubrir el 100% de la ventana de visualización */
+  padding: 20px;
+  background-size: cover; /* Asegura que la imagen cubra todo el área */
+  background-position: center; /* Centra la imagen */
+  background-repeat: no-repeat; /* Evita que la imagen se repita */
+  background-attachment: fixed; /* Hace que la imagen quede fija mientras haces scroll */
+  background-color: #f9f9f9; /* Color de respaldo si la imagen no se carga */
+  background-image: url('~@/assets/fondo1.jpg'); /* Usa require para que Webpack gestione la ruta */
 }
 
 /* Cabecera */
 .header {
   width: 100%;
   height: 164px;
+  margin-top: auto;
   background-color: #FFFFFF;
   display: flex;
   justify-content: center;
@@ -206,12 +212,13 @@ export default {
 /* Contenedor del perfil */
 .profile-container {
   width: 300px;
-  margin-top: 50px;
-  background-color: #FFFFFF;
+  margin-top: auto;
+  background: rgba(0,0,0,.9);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 25px rgba(0,0,0,.6);
   text-align: center;
+  align-items: center;
 }
 
 /* Imagen de perfil */
@@ -234,7 +241,8 @@ export default {
 
 .form-group label {
   font-size: 14px;
-  color: #1F2937;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -255,6 +263,7 @@ export default {
   border-radius: 6px;
   background-color: #FFFFFF;
   min-height: 80px;
+  font-family: 'Inter', sans-serif;
   resize: vertical;
 }
 
@@ -266,12 +275,15 @@ export default {
 .submit-btn {
   width: 100px;
   height: 40px;
+  margin-left: auto;
+  margin-right: auto;
   background-color: #1815AA;
   color: #F7F7F7;
   border: none;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   box-shadow: 5px 5px 0px #000000;
   margin-top: 20px;
@@ -283,19 +295,40 @@ export default {
   background-color: #1815AA;
   color: white;
   padding: 10px;
-  border-radius: 5px;
+  border:none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
+  box-shadow: 5px 5px 0px #000000;
 }
 
 /* Campo adicional de descripción */
 .form-group.description-group textarea {
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
   line-height: 20px;
 }
 
 /* Campo de enlaces */
 .form-group.enlaces-group input {
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estilo para el enlace ServiPro */
+.servipro-link {
+  font-size: 42px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.servipro-link:hover {
+  text-decoration: underline;
 }
 </style>

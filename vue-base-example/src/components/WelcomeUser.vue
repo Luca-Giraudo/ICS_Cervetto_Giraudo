@@ -19,17 +19,17 @@
       <!-- Mensaje de bienvenida -->
       <h1>Bienvenido, {{ user.first_name }}!</h1>
 
-      <!-- Buscador -->
-      <div class="search-bar">
-        <input type="text" class="input" placeholder="Buscar...">
-        <span class="icon">🔍</span>
-      </div>
-
       <!-- Botón para ir al perfil -->
       <button @click="goToProfile" class="profile-btn">Ir al Perfil</button>
 
+      <!-- Buscador -->
+      <div class="InputContainer">
+        <input type="text" class="input" placeholder="Buscar..." />
+        <div class="border"></div>
+      </div>
+
       <!-- Populares -->
-      <p class="populares-text">🔥 Populares</p>
+      <p class="populares-text">🔥 Servicios Populares</p>
 
       <!-- Listado de empresas en formato de cards -->
       <div class="empresa-list">
@@ -143,9 +143,16 @@ export default {
 <style scoped>
 /* Estilos ajustados al diseño que proporcionaste */
 .welcome-container {
-  width: 1440px;
-  height: 1024px;
-  background: #FFFFFF;
+  width: 100%;
+  min-height: 100vh; /* Asegura que la altura mínima sea la del viewport */
+  background-image: url('~@/assets/fondo1.jpg'); /* Ruta de la imagen de fondo */
+  background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Mantiene la imagen de fondo fija durante el scroll */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Asegura que el contenido esté arriba */
 }
 
 .header {
@@ -155,16 +162,24 @@ export default {
 }
 
 .logo-left h2 {
-  font-size: 32px;
+  font-size: 42px;
   font-weight: bold;
-  color: #1815AA;
+  font-family: 'Inter', sans-serif;
+  color: black;
 }
 
 .logout-center button {
-  background-color: transparent;
-  border: 2px solid black;
+  background-color: rgb(5, 0, 93);
+  border: 2px solid rgb(255, 255, 255);
   padding: 10px 20px;
   cursor: pointer;
+  color: white;
+  font-size: 16px;
+}
+
+.logout-center button:hover {
+  background-color: #db730b;
+  color: white;
 }
 
 .content {
@@ -174,28 +189,82 @@ export default {
   margin-top: 25px;
 }
 
+.content h1 {
+  font-family: 'Inter', sans-serif;
+  background-color: rgba(9, 22, 162, 0.593);
+  border-radius: 8px;
+  color: white;
+  width: fit-content;
+  font-weight: bold;
+}
+
 .project-logo {
   width: 300px;
   height: 300px;
+  border-radius: 10px;
 }
 
-.search-bar {
-  margin-top: 20px;
-  width: 280px;
-  position: relative;
+.InputContainer {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  padding-left: 15px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.075);
+  margin-top: 10%;
+  width: 300px; /* Ajustar el ancho para que coincida con el logo */
+  border-color: black;
+}
+
+.input {
+  width: 170px;
+  height: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.9em;
+  caret-color: rgb(255, 81, 0);
+}
+
+.labelforsearch {
+  cursor: text;
+  padding: 0px 12px;
+}
+
+.searchIcon {
+  width: 13px;
+}
+
+.searchIcon path {
+  fill: rgb(114, 114, 114);
 }
 
 .profile-btn {
-  background-color: #4CAF50;
-  color: white;
+  background-color: rgb(5, 0, 93);
+  border: 2px solid rgb(255, 255, 255);
   padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 20px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px
+}
+
+.profile-btn:hover {
+  background-color: #db730b;
+  color: white;
 }
 
 .populares-text {
   font-size: 20px;
-  color: #1815AA;
+  margin-top: 2%;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(9, 22, 162, 0.593);
+  border-radius: 8px;
+  width: fit-content;
 }
 
 .empresa-list {
@@ -208,7 +277,7 @@ export default {
 
 .empresa-card {
   width: 404px;
-  height: 366px;
+  height: 403px;
   border-radius: 8px;
   background: #F7F7F7;
   display: flex;
@@ -216,22 +285,27 @@ export default {
   align-items: flex-start;
   padding: 24px;
   cursor: pointer;
+  background-color: #b9c4c6;
 }
 
 .empresa-avatar {
-  width: 404px;
+  width: 364px;
   height: 250px;
   border-radius: 8px;
 }
 
 .empresa-details {
-  margin-top: 10px;
+  margin-top: 0.00001%;
   text-align: left;
+  font-family: 'Inter', sans-serif;
+  color: black;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
 }
 </style>

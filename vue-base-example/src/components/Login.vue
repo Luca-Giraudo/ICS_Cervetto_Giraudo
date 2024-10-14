@@ -1,24 +1,26 @@
 <template>
-  <div class="login-box">
-    <p>Iniciar Sesión</p>
-    <form @submit.prevent="login">
-      <div class="user-box">
-        <input type="email" v-model="email" required />
-        <label for="email">Email</label>
-      </div>
-      <div class="user-box">
-        <input type="password" v-model="password" required />
-        <label for="password">Contraseña</label>
-      </div>
-      <a href="#" @click="login">Iniciar Sesión
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </a>
-    </form>
-    <p v-if="error" class="error">{{ error }}</p> <!-- Muestra el mensaje de error -->
-    <p>¿No tienes cuenta? <router-link to="/register" class="a2">Regístrate aquí</router-link></p>
+  <div class="login-container">
+    <div class="login-box">
+      <p>Iniciar Sesión</p>
+      <form @submit.prevent="login">
+        <div class="user-box">
+          <input type="email" v-model="email" required />
+          <label for="email">Email</label>
+        </div>
+        <div class="user-box">
+          <input type="password" v-model="password" required />
+          <label for="password">Contraseña</label>
+        </div>
+        <a href="#" @click="login">Iniciar Sesión
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </a>
+      </form>
+      <p v-if="error" class="error">{{ error }}</p> <!-- Muestra el mensaje de error -->
+      <p>¿No tienes cuenta? <router-link to="/register" class="a2">Regístrate aquí</router-link></p>
+    </div>
   </div>
 </template>
 
@@ -66,6 +68,19 @@ export default {
 </script>
 
 <style scoped>
+
+.login-container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('~@/assets/fondo1.jpg'); /* Imagen de fondo */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* Estilos de Uiverse.io */
 .login-box {
   position: absolute;
@@ -88,6 +103,7 @@ export default {
   text-align: center;
   font-size: 1.5rem;
   font-weight: bold;
+  font-family: 'Inter', sans-serif;
   letter-spacing: 1px;
 }
 
@@ -99,6 +115,7 @@ export default {
   width: 100%;
   padding: 10px 0;
   font-size: 16px;
+  font-family: 'Inter', sans-serif;
   color: #fff;
   margin-bottom: 30px;
   border: none;
@@ -113,6 +130,7 @@ export default {
   left: 0;
   padding: 10px 0;
   font-size: 16px;
+  font-family: 'Inter', sans-serif;
   color: #fff;
   pointer-events: none;
   transition: .5s;
@@ -124,6 +142,7 @@ export default {
   left: 0;
   color: #fff;
   font-size: 12px;
+  font-family: 'Inter', sans-serif;
 }
 
 .login-box form a {
@@ -131,6 +150,7 @@ export default {
   display: inline-block;
   padding: 10px 20px;
   font-weight: bold;
+  font-family: 'Inter', sans-serif;
   color: #fff;
   font-size: 16px;
   text-decoration: none;
@@ -239,6 +259,7 @@ export default {
 .login-box p:last-child {
   color: #aaa;
   font-size: 14px;
+  font-family: 'Inter', sans-serif;
 }
 
 .login-box a.a2 {

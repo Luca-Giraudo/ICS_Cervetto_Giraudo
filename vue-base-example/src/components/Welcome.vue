@@ -37,11 +37,16 @@ export default {
 .welcome-container {
   position: relative;
   text-align: center;
-  padding-top: 10px; /* Reduce el espacio superior */
-  min-height: 100vh; /* Asegura que ocupe toda la pantalla */
+  padding-top: 10px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Mueve el contenido más arriba */
+  justify-content: flex-start;
+  background-image: url('~@/assets/fondo1.jpg'); /* Usa require para que Webpack gestione la ruta */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
 }
 
 .header {
@@ -51,9 +56,10 @@ export default {
 }
 
 .logo-left h2 {
-  font-size: 32px;
+  font-size: 42px;
   font-weight: bold;
-  color: #333;
+  color: #000000;
+  font-family: 'Inter', sans-serif;
 }
 
 .logo-container {
@@ -64,11 +70,20 @@ export default {
   width: 300px;
   height: 300px;
   margin: 10px 0; /* Ajusta el margen para subir el logo */
+  border-radius: 10px;
 }
 
 h1 {
   font-size: 28px;
   margin-top: 10px; /* Reduce el margen superior del mensaje de bienvenida */
+  font-family: 'Inter', sans-serif;
+  background-color: rgba(9, 22, 162, 0.593);
+  border-radius: 8px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  font-weight: bold;
+  color: #ffffff;
 }
 
 .auth-buttons {
@@ -76,27 +91,36 @@ h1 {
 }
 
 .auth-buttons button {
-  background-color: transparent;
-  border: 2px solid black;
+  background-color: rgb(5, 0, 93);
+  border: 2px solid rgb(255, 255, 255);
   padding: 10px 20px;
   margin-right: 10px;
   cursor: pointer;
+  color:#ffffff;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
 }
 
 .auth-buttons button:hover {
-  background-color: #d32f2f;
+  background-color: #db730b;
   color: white;
 }
 
 .register-link {
+  background-color: rgb(5, 0, 93);
   font-size: 16px;
-  text-decoration: none;
+  border: 2px solid rgb(255, 255, 255);
   padding: 10px 20px;
-  border: 2px solid black;
+  margin-right: 10px;
+  cursor: pointer;
+  color:#ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
 }
 
 .register-link:hover {
-  background-color: #4caf50;
+  background-color: #db730b;
   color: white;
 }
 </style>

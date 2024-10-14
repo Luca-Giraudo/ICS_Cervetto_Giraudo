@@ -1,9 +1,9 @@
 <template>
   <div class="profile-page">
-    <!-- Cabecera -->
-    <header class="header">
-      <h1 class="logo">ServiPro</h1>
-    </header>
+
+    <router-link to="/welcome-user" class="servipro-link">
+        ServiPro
+    </router-link>
 
     <!-- Contenedor del perfil -->
     <div class="profile-container">
@@ -177,15 +177,22 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-image: url('~@/assets/fondo1.jpg'); /* Usa require para que Webpack gestione la ruta */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
 }
 
 /* Cabecera */
 .header {
   width: 100%;
   height: 164px;
-  background-color: #FFFFFF;
+  margin-top: auto;
+  background-color: #c0b5b5;
   display: flex;
   justify-content: center;
+  font-family: 'Inter', sans-serif;
   align-items: center;
 }
 
@@ -193,18 +200,19 @@ export default {
   font-family: 'Inter', sans-serif;
   font-size: 40px;
   font-weight: 500;
-  color: #1815AA;
+  color: #000000;
 }
 
 /* Contenedor del perfil */
 .profile-container {
   width: 300px;
-  margin-top: 50px;
-  background-color: #FFFFFF;
+  margin-top: 35px;
+  background: rgba(0,0,0,.9);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 25px rgba(0,0,0,.6);
   text-align: center;
+  align-items: center;
 }
 
 /* Imagen de perfil */
@@ -227,8 +235,9 @@ export default {
 
 .form-group label {
   font-size: 14px;
-  color: #1F2937;
+  color: #ffffff;
   font-weight: 600;
+  font-family: 'Inter', sans-serif;
 }
 
 .form-group input {
@@ -248,12 +257,15 @@ export default {
 .submit-btn {
   width: 100px;
   height: 40px;
+  margin-left: auto;
+  margin-right: auto;
   background-color: #1815AA;
   color: #F7F7F7;
   border: none;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   box-shadow: 5px 5px 0px #000000;
   margin-top: 20px;
@@ -265,7 +277,27 @@ export default {
   background-color: #1815AA;
   color: white;
   padding: 10px;
-  border-radius: 5px;
+  border:none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 5px 5px 0px #000000;
+}
+
+/* Estilo para el enlace ServiPro */
+.servipro-link {
+  font-size: 42px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.servipro-link:hover {
+  text-decoration: underline;
 }
 </style>
