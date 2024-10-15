@@ -156,6 +156,7 @@ export default {
           }
         });
         console.log('Perfil actualizado:', response.data);
+        alert('Perfil de usuario actualizado con éxito');
       } catch (error) {
         console.error('Error al actualizar el perfil:', error.response.data);
       }
@@ -267,7 +268,7 @@ export default {
   font-weight: 700;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  box-shadow: 5px 5px 0px #000000;
+  box-shadow: 2px 2px 0px #df7001;
   margin-top: 20px;
 }
 
@@ -284,7 +285,7 @@ export default {
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
-  box-shadow: 5px 5px 0px #000000;
+  box-shadow: 2px 2px 0px #df7001;
 }
 
 /* Estilo para el enlace ServiPro */

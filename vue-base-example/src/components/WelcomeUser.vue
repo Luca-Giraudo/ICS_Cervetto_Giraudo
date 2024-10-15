@@ -171,6 +171,7 @@ export default {
 .logout-center button {
   background-color: rgb(5, 0, 93);
   border: 2px solid rgb(255, 255, 255);
+  border-radius: 10px;
   padding: 10px 20px;
   cursor: pointer;
   color: white;
@@ -245,6 +246,7 @@ export default {
 .profile-btn {
   background-color: rgb(5, 0, 93);
   border: 2px solid rgb(255, 255, 255);
+  border-radius: 10px;
   padding: 10px 20px;
   cursor: pointer;
   color: white;
