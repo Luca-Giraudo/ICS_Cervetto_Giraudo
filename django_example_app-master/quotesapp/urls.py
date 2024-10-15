@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from quotes.views import index, main, RegisterAPI, LoginAPI, UserDetailAPI
+from quotes.views import index, main, RegisterAPI, LoginAPI, UserDetailAPI, UserProfileView, UpdateEmpresaProfileView, UpdateProfileView,  listar_perfiles_empresa
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,5 +26,12 @@ urlpatterns = [
     path('api/register/', RegisterAPI.as_view(), name='register'),
     path('api/login/', LoginAPI.as_view(), name='login'),
     path('api/user/', UserDetailAPI.as_view(), name='user-detail'),
+    path('api/profile/', UserProfileView.as_view(), name='user_profile'),
+    path('api/update-empresa/', UpdateEmpresaProfileView.as_view(), name='update_empresa'),
+    path('api/update-profile/', UpdateProfileView.as_view(), name='update_profile'),
+    path('api/empresas/', listar_perfiles_empresa, name='listar_empresas')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

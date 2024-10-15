@@ -1,8 +1,59 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Perfil
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+
+class PerfilSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Perfil
+        fields = ['nombre', 'descripcion', 'enlaces', 'localidad', 'telefono', 'imagen']
+        extra_kwargs = {
+            'nombre': {'required': False},  # Permitir que sea opcional
+            'localidad': {'required': False},  # Permitir que sea opcional
+            'telefono': {'required': False},  # Permitir que sea opcional
+            'descripcion': {'required': False},
+            'enlaces': {'required': False},
+            'imagen': {'required': False},
+        }
+
+        def update(self, instance, validated_data):
+        # Actualiza solo los campos correspondientes, dependiendo del perfil
+            if 'descripcion' in validated_data:  # Campo exclusivo de empresa
+                instance.descripcion = validated_data.get('descripcion', instance.descripcion)
+            if 'enlaces' in validated_data:  # Campo exclusivo de empresa
+                instance.enlaces = validated_data.get('enlaces', instance.enlaces)
+
+        # Campos comunes
+            instance.nombre = validated_data.get('nombre', instance.nombre)
+            instance.localidad = validated_data.get('localidad', instance.localidad)
+            instance.telefono = validated_data.get('telefono', instance.telefono)
+
+            instance.save()
+            return instance
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    perfil = PerfilSerializer()
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'first_name', 'last_name', 'perfil']
+
+    def update(self, instance, validated_data):
+        perfil_data = validated_data.pop('perfil', None)
+
+        # Actualización de PerfilUsuario
+        if perfil_data:
+            perfil = instance.perfil
+            for attr, value in perfil_data.items():
+                setattr(perfil, attr, value)
+            perfil.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
