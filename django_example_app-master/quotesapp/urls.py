@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from quotes.views import index, main, RegisterAPI, LoginAPI, UserDetailAPI, UserProfileView, UpdateEmpresaProfileView, UpdateProfileView,  listar_perfiles_empresa
+from quotes.views import index, main, RegisterAPI, LoginAPI, UserDetailAPI, UserProfileView, UpdateEmpresaProfileView, UpdateProfileView,  listar_perfiles_empresa, toggle_favorito, listar_favoritos
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -29,7 +29,9 @@ urlpatterns = [
     path('api/profile/', UserProfileView.as_view(), name='user_profile'),
     path('api/update-empresa/', UpdateEmpresaProfileView.as_view(), name='update_empresa'),
     path('api/update-profile/', UpdateProfileView.as_view(), name='update_profile'),
-    path('api/empresas/', listar_perfiles_empresa, name='listar_empresas')
+    path('api/empresas/', listar_perfiles_empresa, name='listar_empresas'),
+    path('api/favorito/<int:perfil_id>/', toggle_favorito, name='toggle_favorito'),
+    path('api/favoritos/', listar_favoritos, name='listar_favoritos'),
 ]
 
 if settings.DEBUG:

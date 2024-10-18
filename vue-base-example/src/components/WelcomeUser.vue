@@ -28,16 +28,25 @@
         <div class="border"></div>
       </div>
 
+      <div class="nav-buttons">
+        <button @click="goToWelcomeUser" class="nav-btn">Populares</button>
+        <button class="nav-btn">Cercanos</button>
+        <button @click="goToFavorites" class="nav-btn">Favoritos</button>
+      </div>
+
       <!-- Populares -->
       <p class="populares-text">🔥 Servicios Populares</p>
 
       <!-- Listado de empresas en formato de cards -->
       <div class="empresa-list">
-        <div v-for="empresa in empresas" :key="empresa.id" class="empresa-card" @click="irAlPerfilDeEmpresa(empresa.id)">
-          <img :src="empresa.imagen ? empresa.imagen : require('@/assets/perfilplaceholder.png')" alt="Imagen de empresa" class="empresa-avatar" />
+        <div v-for="perfil in empresas" :key="perfil.id" class="empresa-card">
+          <!-- Botón de favoritos -->
+          <button @click="toggleFavorito(perfil.id)" class="favorito-btn"></button>
+
+          <img :src="perfil.imagen ? perfil.imagen : require('@/assets/perfilplaceholder.png')" alt="Imagen de empresa" class="empresa-avatar" />
           <div class="empresa-details">
-            <h3>{{ empresa.nombre }}</h3>
-            <p>{{ empresa.descripcion }}</p>
+            <h3>{{ perfil.nombre }}</h3>
+            <p>{{ perfil.descripcion }}</p>
           </div>
         </div>
       </div>
@@ -109,6 +118,7 @@ export default {
             Authorization: `Token ${token}`,
           },
         });
+        console.log('Empresas:', response.data.results);
         this.empresas = response.data.results.map(empresa => ({
           ...empresa,
           imagen: `http://127.0.0.1:8000${empresa.imagen}`  // Construir la URL completa de la imagen
@@ -136,7 +146,31 @@ export default {
     goToProfile() {
       this.$router.push('/profile');
     },
-  },
+    goToWelcomeUser() {
+      this.$router.push('/welcome-user');
+    },
+    goToFavorites() {
+      this.$router.push('/favorites');
+    },
+    async toggleFavorito(perfil_id) {
+      console.log('ID del perfil:', perfil_id); // Verificar si el ID está siendo capturado correctamente
+      if (!perfil_id) {
+        console.error('Error: El perfil_id es undefined');
+        return;
+      }
+      try {
+        const response = await axios.post(`http://127.0.0.1:8000/api/favorito/${perfil_id}/`, {}, {
+          headers: {
+            Authorization: `Token ${localStorage.getItem('token')}`
+          }
+        });
+        console.log(response.data.message);
+        this.fetchEmpresas(); // Refrescar la lista de empresas para mostrar el cambio en los favoritos
+      } catch (error) {
+        console.error('Error al agregar/quitar favorito:', error);
+      }
+    },
+  }
 };
 </script>
 
@@ -258,15 +292,40 @@ export default {
   color: white;
 }
 
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.nav-btn {
+  background-color: rgb(5, 0, 93);
+  color: white;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nav-btn:hover {
+  background-color: #db730b;
+  color: white;
+}
+
 .populares-text {
   font-size: 20px;
-  margin-top: 2%;
+  margin-top: 60px;
+  margin-left: 120px;
   font-family: 'Inter', sans-serif;
   font-weight: bold;
   color: white;
   background-color: rgba(9, 22, 162, 0.593);
   border-radius: 8px;
   width: fit-content;
+  text-align: left;
+  align-self: flex-start;
 }
 
 .empresa-list {
@@ -278,8 +337,10 @@ export default {
 }
 
 .empresa-card {
+  margin-top: 0.005px;
+  position: relative;
   width: 404px;
-  height: 403px;
+  height: 376px;
   border-radius: 8px;
   background: #F7F7F7;
   display: flex;
@@ -301,6 +362,27 @@ export default {
   text-align: left;
   font-family: 'Inter', sans-serif;
   color: black;
+}
+
+.favorito-btn {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  top: 10px;
+  right: 10px;
+  background: #F7F7F7;
+  border: 2.1px solid #000000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.favorito-btn::before {
+  content: '★'; /* Estrella de favorito */
+  position: absolute;
+  font-size: 20px;
+  color: #DEC543;
+  top: 12px;
+  left: 15px;
 }
 
 .pagination {

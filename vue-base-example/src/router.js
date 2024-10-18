@@ -8,6 +8,7 @@ import Welcome from './components/Welcome.vue';
 import WelcomeUser from './components/WelcomeUser.vue';
 import Profile from './components/Profile.vue';
 import ProfileEmpresa from './components/ProfileEmpresa.vue';
+import Favorites from './components/Favorites.vue';
 
 Vue.use(Router);
 
@@ -20,5 +21,6 @@ export default new Router({
     { path: '/register', component: Register },
     { path: '/profile', component: Profile },
     { path: '/empresa-profile', component: ProfileEmpresa},
+    { path: '/favorites', component: Favorites},
   ]
 });

@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
-from .models import Perfil
+from .models import Perfil, Favorito
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes
@@ -146,3 +146,32 @@ def listar_perfiles_empresa(request):
     result_page = paginator.paginate_queryset(perfiles, request)
     serializer = PerfilSerializer(result_page, many=True)
     return paginator.get_paginated_response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_favorito(request, perfil_id):
+    user = request.user
+    try:
+        servicio = Perfil.objects.get(id=perfil_id)
+    except Perfil.DoesNotExist:
+        return Response({'error': 'Servicio no encontrado'}, status=404)
+
+    # Verificar si ya es favorito
+    favorito_existente = Favorito.objects.filter(usuario=user, servicio=servicio).first()
+    if favorito_existente:
+        # Si ya es favorito, lo eliminamos
+        favorito_existente.delete()
+        return Response({'message': 'Servicio eliminado de favoritos'}, status=200)
+    else:
+        # Si no es favorito, lo agregamos
+        Favorito.objects.create(usuario=user, servicio=servicio)
+        return Response({'message': 'Servicio agregado a favoritos'}, status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_favoritos(request):
+    user = request.user
+    favoritos = Favorito.objects.filter(usuario=user)
+    servicios = [f.servicio for f in favoritos]
+    serializer = PerfilSerializer(servicios, many=True)
+    return Response({'favoritos': serializer.data})

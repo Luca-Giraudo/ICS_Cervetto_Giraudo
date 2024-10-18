@@ -8,7 +8,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    favoritos = models.ForeignKey('Favorito', on_delete=models.CASCADE, null=True, blank=True)
+    favoritos = models.ManyToManyField('Favorito', blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nombre', 'apellido']
@@ -53,4 +53,5 @@ class Perfil(models.Model):
         return self.nombre
 
 class Favorito(models.Model):
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
     servicio = models.ForeignKey('Perfil', on_delete=models.CASCADE, null=True, blank=True)
